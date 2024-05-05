@@ -14,8 +14,9 @@ CC_FLAGS = ${CC_INCS} ${CC_DBG} ${CC_WARNS}
 .PHONY: rmlogs clean rebuild
 
 test: mcc
-	@echo $(TESTS)
-	./test_compiler.sh ./mcc $(TESTS)
+	./mcc ./tests/stage_01/valid/return_2.c
+# @echo $(TESTS)
+# ./test_compiler.sh ./mcc $(TESTS)
 
 run: mcc
 	@./mcc

@@ -17,12 +17,15 @@ int lexer(char* inputFilePath, vector* tokens) {
 
 	while(!feof(inFile) && index < TOK_SIZE) {
 		if(fread(&ch, 1, 1, inFile) != 1) {
-			dbglog("fread returned != 1: ch holds value %d", (int)ch);
+			dbglog("fread returned != 1: ch holds value %d : '%c'", (int)ch, ch);
 		}
 
 		if(isWS(ch)) {
+			dbglog("got ch: '%c'", ch);
 			if(index) {
+				dbglog("allocating str: token holds: '%s'", token);
 				str = allocateStr(token, 0);
+				dbglog("test for str: '%s'", str);
 				vector_append(tokens, str);
 				memset(token, 0, TOK_SIZE);
 				index = 0;
@@ -32,10 +35,13 @@ int lexer(char* inputFilePath, vector* tokens) {
 			}
 		}
 		else if(isChar(ch) || isDigit(ch)) {
+			dbglog("got ch: '%c'", ch);
 			token[index++] = ch;
 		}
 		else if(isSpec(ch)) {
+			dbglog("got ch: '%c'", ch);
 			if(index) {
+				dbglog("allocating str: token holds: '%s'", token);
 				str = allocateStr(token, 0);
 				vector_append(tokens, str);
 				memset(token, 0, TOK_SIZE);
@@ -44,13 +50,7 @@ int lexer(char* inputFilePath, vector* tokens) {
 			str = allocateStr(&ch, 1);
 			vector_append(tokens, str);
 		}
-	}
-
-	if(index) {
-		str = allocateStr(token, 0);
-		vector_append(tokens, str);
-		memset(token, 0, TOK_SIZE);
-		index = 0;
+		ch = '\0';
 	}
 
 	fclose(inFile);

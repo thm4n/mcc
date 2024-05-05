@@ -94,16 +94,24 @@ char* allocateStr(const char* str, int size) {
 			return NULL;
 		}
 		ret[0] = *str;
+		ret[size] = '\0';
 	}
 	else {
-		ret = (char*)malloc(sizeof(char) * size);
+		inflog("got here");
+		if(size == 0)
+			size = strlen(str);
+		inflog("got here");
+		ret = (char*)malloc(sizeof(char) * (size + 1));
 		if(!ret) {
 			errlog(ERRCODE_MEM_MSG);
 			return NULL;
 		}
+		inflog("got here");
 		memcpy(ret, str, size);
+		inflog("got here");
+		ret[size] = '\0';
+		inflog("ret: '%s' | str: '%s'", ret, str);
 	}
 	
-	ret[size] = '\0';
 	return ret;
 }
