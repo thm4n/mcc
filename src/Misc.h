@@ -12,4 +12,6 @@ int isSpec(const char ch);
 
 int isValidName(const char* tok);
 
+char* allocateStr(const char* str, int size);
+
 #endif

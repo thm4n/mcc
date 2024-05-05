@@ -12,5 +12,6 @@
 
 //local
 #include "Misc.h"
+#include "Lexer.h"
 
 #endif

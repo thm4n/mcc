@@ -1,5 +1,5 @@
-HDR = $(shell find . -type f -name *.h)
-SRC = $(shell find . -type f -name *.c)
+HDR = $(shell find ./src -type f -name *.h)
+SRC = $(shell find ./src -type f -name *.c)
 OBJ = $(SRC:.c=.o)
 
 CC = gcc

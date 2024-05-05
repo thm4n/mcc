@@ -46,5 +46,14 @@ int lexer(char* inputFilePath, vector* tokens) {
 		}
 	}
 
+	if(index) {
+		str = allocateStr(token, 0);
+		vector_append(tokens, str);
+		memset(token, 0, TOK_SIZE);
+		index = 0;
+	}
+
+	fclose(inFile);
+
 	return _errcode_clean;
 }

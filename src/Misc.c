@@ -1,14 +1,32 @@
 #include "Misc.h"
 
 void initLogger(int argc, char** argv) {
-	char* logname = (char*)malloc(sizeof(char) * 64);
-	if(!logname)
+	char* buffer = NULL;
+	int bufflen = 0;
+	int index = 0;
+	
+	buffer = (char*)malloc(sizeof(char) * (LOG_FILE_NAME_SIZE + 1));
+	if(!buffer)
 		exitWithError(_errcode_log_error, ERRCODE_MEM_MSG);
-	snprintf(logname, 64, "./logs/log_%s.log", __TIMESTAMP__);
+	snprintf(buffer, LOG_FILE_NAME_SIZE, "./logs/log_%s.log", __TIMESTAMP__);
+	initDebugLog(buffer);
+	free(buffer);
 
-	initDebugLog(logname);
+	for(int i = 0; i < argc; i++)
+		bufflen += strlen(argv[i]) + 1;
+	
+	buffer = (char*)malloc(sizeof(char) * bufflen);
+	if(!buffer)
+		exitWithError(_errcode_log_error, ERRCODE_MEM_MSG);
 
-	free(logname);
+	for(int i = 0; i < argc; i++)
+		index += snprintf(buffer + index, bufflen - index, "%s ", argv[i]);
+
+	buffer[bufflen - 1] = '\0';
+
+	nonlog("entry command: '%s'", buffer);
+
+	free(buffer);
 }
 
 int isWS(const char ch) {
@@ -61,4 +79,31 @@ int isValidName(const char* tok) {
 	}
 
 	return true;
+}
+
+char* allocateStr(const char* str, int size) {
+	char* ret = NULL;
+	
+	if(!str)
+		return NULL;
+
+	if(size == 1) {
+		ret = (char*)malloc(sizeof(char) * 2);
+		if(!ret) {
+			errlog(ERRCODE_MEM_MSG);
+			return NULL;
+		}
+		ret[0] = *str;
+	}
+	else {
+		ret = (char*)malloc(sizeof(char) * size);
+		if(!ret) {
+			errlog(ERRCODE_MEM_MSG);
+			return NULL;
+		}
+		memcpy(ret, str, size);
+	}
+	
+	ret[size] = '\0';
+	return ret;
 }
