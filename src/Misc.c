@@ -97,20 +97,15 @@ char* allocateStr(const char* str, int size) {
 		ret[size] = '\0';
 	}
 	else {
-		inflog("got here");
 		if(size == 0)
 			size = strlen(str);
-		inflog("got here");
 		ret = (char*)malloc(sizeof(char) * (size + 1));
 		if(!ret) {
 			errlog(ERRCODE_MEM_MSG);
 			return NULL;
 		}
-		inflog("got here");
 		memcpy(ret, str, size);
-		inflog("got here");
 		ret[size] = '\0';
-		inflog("ret: '%s' | str: '%s'", ret, str);
 	}
 	
 	return ret;
