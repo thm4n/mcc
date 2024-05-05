@@ -11,7 +11,11 @@ CC_WARNS = -Wall
 
 CC_FLAGS = ${CC_INCS} ${CC_DBG} ${CC_WARNS}
 
-.PHONY: clean rebuild
+.PHONY: rmlogs clean rebuild
+
+test: mcc
+	@echo $(TESTS)
+	./test_compiler.sh ./mcc $(TESTS)
 
 run: mcc
 	@./mcc
