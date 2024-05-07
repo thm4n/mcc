@@ -4,7 +4,7 @@
 #define false (0)
 #define true (!false)
 
-#define DEBUG true
+#define DEBUG false
 #define ERROR_EXIT_CODE (-1)
 
 #define BUFF_SIZE 256

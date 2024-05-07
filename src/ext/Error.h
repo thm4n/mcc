@@ -3,6 +3,8 @@
 
 #include "TermManip.h"
 
+#include "Defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
