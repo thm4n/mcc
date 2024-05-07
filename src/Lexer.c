@@ -1,10 +1,10 @@
 #include "Lexer.h"
 
-#define TOK_SIZE 32
+#define MAX_TOK_SIZE 32
 
 int lexer(char* inputFilePath, vector* tokens) {
 	FILE* inFile = NULL;
-	char token[TOK_SIZE] = {0};
+	char token[MAX_TOK_SIZE] = {0};
 	char* str = NULL;
 	int index = 0;
 	char ch = 0;
@@ -15,7 +15,7 @@ int lexer(char* inputFilePath, vector* tokens) {
 		return _errcode_IO;
 	}
 
-	while(!feof(inFile) && index < TOK_SIZE) {
+	while(!feof(inFile) && index < MAX_TOK_SIZE) {
 		if(fread(&ch, 1, 1, inFile) != 1) {
 			dbglog("fread returned != 1: ch holds value %d : '%c'", (int)ch, ch);
 		}
@@ -27,7 +27,7 @@ int lexer(char* inputFilePath, vector* tokens) {
 				str = allocateStr(token, 0);
 				dbglog("test for str: '%s'", str);
 				vector_append(tokens, str);
-				memset(token, 0, TOK_SIZE);
+				memset(token, 0, MAX_TOK_SIZE);
 				index = 0;
 			}
 			else {
@@ -44,7 +44,7 @@ int lexer(char* inputFilePath, vector* tokens) {
 				dbglog("allocating str: token holds: '%s'", token);
 				str = allocateStr(token, 0);
 				vector_append(tokens, str);
-				memset(token, 0, TOK_SIZE);
+				memset(token, 0, MAX_TOK_SIZE);
 				index = 0;
 			}
 			str = allocateStr(&ch, 1);
