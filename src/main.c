@@ -24,13 +24,35 @@ int main(int argc, char** argv) {
 
 int handleFile(char* filePath) {
 	vector* tokens = vector_ctor();
-
-	int res = lexer(filePath, tokens);
+	char* outFilePath = NULL;
+	FILE* outFile = NULL;
+	int res = 0;
+	
+	inflog("Starting 1st stage:");
+	res = lexer(filePath, tokens);
 
 	if(res != EXIT_SUCCESS) {
-		dbglog("lexer failed with errno: %d", res);
+		inflog("1st stage failed with errno: %d", res);
 		return res;
 	}
+	
+	inflog("Finished 1st stage successfully");
+
+	outFilePath = addFileExt(filePath, ".tok");
+	inflog("Output of 1st stage stored in %s", outFilePath);
+	outFile = fopen(outFilePath, "w+");
+	if(!outFile) {
+		exitWithError(_errcode_IO, ERRCODE_IO_MSG);
+	}
+
+	for(int i = 0; i < tokens->_length; i++) {
+		fprintf(outFile, "%s\n", tokens->_array[i]);
+	}
+
+	fclose(outFile);
+
+	// inflog("Starting 2nd stage:");
+	// inflog("Finished 2nd stage successfully");
 
 	printf("------- %s -------\n", filePath);
 	for(int i = 0; i < tokens->_length; i++) {

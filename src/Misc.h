@@ -5,6 +5,8 @@
 
 void initLogger(int argc, char** argv);
 
+char* addFileExt(const char* fileName, const char* ext);
+
 int isWS(const char ch);
 int isDigit(const char ch);
 int isChar(const char ch);

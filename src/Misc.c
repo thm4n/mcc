@@ -29,6 +29,32 @@ void initLogger(int argc, char** argv) {
 	free(buffer);
 }
 
+char* addFileExt(const char* fileName, const char* ext) {
+	char* ret = NULL;
+	int len = 0;
+	int i, j;
+
+	if(!fileName || !ext) {
+		return NULL;
+	}
+
+	len = strlen(fileName) + strlen(ext) + 1;
+	ret = (char*)malloc(sizeof(char) * len);
+	if(!ret) {
+		exitWithError(_errcode_mem_err, ERRCODE_MEM_MSG);
+	}
+
+	for(i = 0; i < strlen(fileName); i++) {
+		ret[i] = fileName[i];
+	}
+	for(j = 0; i < len; i++) {
+		ret[i] = ext[j++];
+	}
+	ret[i - 1] = '\0';
+	
+	return ret;
+}
+
 int isWS(const char ch) {
 	return (ch == 0x20 ||
 			ch == 0x0A ||
