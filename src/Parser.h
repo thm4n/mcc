@@ -3,8 +3,4 @@
 
 #include "Header.h"
 
-int parser(vector* tokens) {
-	
-}
-
 #endif

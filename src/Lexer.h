@@ -3,6 +3,4 @@
 
 #include "Header.h"
 
-int lexer(char* inputFilePath, vector* tokens);
-
 #endif

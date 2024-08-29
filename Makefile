@@ -1,78 +1,33 @@
-HDR = $(shell find ./src -type f -name *.h)
-SRC = $(shell find ./src -type f -name *.c)
-OBJ = $(SRC:.c=.o)
+SRC_DIR := ./src
+BIN_DIR := ./bin
 
-TESTS_01 = $(shell find ./tests/stage_01 -type f -name *.c)
-TESTS_02 = $(shell find ./tests/stage_02 -type f -name *.c)
-TESTS_03 = $(shell find ./tests/stage_03 -type f -name *.c)
-TESTS_04 = $(shell find ./tests/stage_04 -type f -name *.c)
-TESTS_05 = $(shell find ./tests/stage_05 -type f -name *.c)
-TESTS_06 = $(shell find ./tests/stage_06 -type f -name *.c)
-TESTS_07 = $(shell find ./tests/stage_07 -type f -name *.c)
-TESTS_08 = $(shell find ./tests/stage_08 -type f -name *.c)
-TESTS_09 = $(shell find ./tests/stage_09 -type f -name *.c)
-TESTS_10 = $(shell find ./tests/stage_10 -type f -name *.c)
-TESTS = ${TESTS_01} ${TESTS_02} ${TESTS_03} ${TESTS_04} ${TESTS_05} ${TESTS_06} ${TESTS_07} ${TESTS_08} ${TESTS_09} ${TESTS_10}
+C_SRC     := $(shell find ./src -type f -name "*.c")
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BIN_DIR)/%.o,$(C_SRC))
 
-CC = gcc
-GDB = gdb
+CXX := gcc
+C_FLAGS := -Wall -Werror
+DBGFLAGS := -g3 -fsanitize=address -static-libasan
+INC_FLAGS := -I$(SRC_DIR)
 
-CC_INCS  = -I./src -I./src/ext
-CC_DBG   = -g3 -fsanitize=address -static-libasan
-CC_WARNS = -Wall
+CXXFLAGS := $(C_FLAGS) $(DBGFLAGS) $(INC_FLAGS)
 
-CC_FLAGS = ${CC_INCS} ${CC_DBG} ${CC_WARNS}
+TARGET := $(BIN_DIR)/mcc
 
-.PHONY: rmlogs clean rebuild
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CXX) -c $< -o $@ $(CXXFLAGS) 
 
-test: mcc
-	./mcc ./tests/stage_01/valid/return_2.c
+$(TARGET): $(OBJ_FILES)
+	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-test01: mcc
-	./mcc ${TESTS_01}
-test02: mcc
-	./mcc ${TESTS_02}
-test03: mcc
-	./mcc ${TESTS_03}
-test04: mcc
-	./mcc ${TESTS_04}
-test05: mcc
-	./mcc ${TESTS_05}
-test06: mcc
-	./mcc ${TESTS_06}
-test07: mcc
-	./mcc ${TESTS_07}
-test08: mcc
-	./mcc ${TESTS_08}
-test09: mcc
-	./mcc ${TESTS_09}
-test10: mcc
-	./mcc ${TESTS_10}
+build: ${TARGET}
+rebuild: clean build
+clean:
+	rm -rf $(BIN_DIR)
 
-test-all: mcc
-	./mcc ${TESTS}
-# @echo $(TESTS)
-# ./test_compiler.sh ./mcc $(TESTS)
+debug:
+	@echo "NOT IMPLEMENTED YET"
 
-run: mcc
-	@./mcc
+run: build
 
-rerun: clean mcc
-	@./mcc
-
-build: mcc
-
-rebuild: clean mcc
-
-rmlogs:
-	@rm -f ./logs/*
-
-clean: rmlogs
-	@rm -rf $(shell find . -type f -name *.o)
-	@rm -rf ./mcc
-
-mcc: ${OBJ}
-	${CC} -o $@ $^ ${CC_FLAGS}
-
-%.o: %.c
-	${CC} -o $@ -c $^ ${CC_FLAGS}
+rerun: clean run
