@@ -31,3 +31,5 @@ debug:
 run: build
 
 rerun: clean run
+
+EXTIP := 93.173.160.144
