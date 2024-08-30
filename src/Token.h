@@ -1,26 +1,18 @@
-#ifndef _DATA_STRUCTS_H_
-#define _DATA_STRUCTS_H_
+#ifndef _TOKEN_H_
+#define _TOKEN_H_
 
 #include "Header.h"
 
-// typedef enum _node_t {
-// 	_node_constant,   // constants
-// 	_node_condition,  // condition statement
-// 	_node_assignment, // assignment statement
-// 	_node_code_block, // a code block {...}
-// 	_node_if,         // an if entry
-// 	_node_else_if,    // an else-if entry
-// 	_node_else,       // an else entry
-// 	_return,          // a return
-// } _node_t;
+#define TOKEN_MAX_IDENTIFIER_LENGTH 256
 
 typedef struct Token {
-	// char* _file_path;
-	// int _line;
-	// int _col;
+	char* _file_path;
+	int _line;
+	int _col;
+	int _offset;
  
 	int _len;
-	char* _token;
+	char* _value[TOKEN_MAX_IDENTIFIER_LENGTH];
 
 	enum TokenType {
 // invalid and EOF 
@@ -76,12 +68,12 @@ typedef struct Token {
 		If,             // if
 		Else,           // else
 		For,            // for
-		Do,             // do
+		// Do,             // do
 		While,          // while
-		Extern,         // extern
-		Typedef,        // typedef
-		Signed,         // signed
-		Unsigned,       // unsigned
+		// Extern,         // extern
+		// Typedef,        // typedef
+		// Signed,         // signed
+		// Unsigned,       // unsigned
 		Return,         // return
 
 // kept type words
@@ -95,9 +87,6 @@ typedef struct Token {
 // free words
 		Symbol,         // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
 	} _token_type;
-
-	struct Token* _prev;
-	struct Token* _next;
 } Token;
 
 // typedef struct AST {
