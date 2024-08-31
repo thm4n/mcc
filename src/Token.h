@@ -3,21 +3,23 @@
 
 #include "Header.h"
 
-#define TOKEN_MAX_IDENTIFIER_LENGTH 256
-
 typedef struct Token {
-	char* _filePath;
+	char _filePath[FILENAME_MAX_LENGTH];
+	
+	int _offset;
 	int _line;
 	int _col;
-	int _offset;
  
 	int _len;
-	char _value[TOKEN_MAX_IDENTIFIER_LENGTH];
+	char _value[IDENTIFIER_MAX_LENGTH];
 
 	enum TokenType {
 // invalid and EOF 
-		Invalid,
-		Eof,
+		Invalid = -1,
+		TokenTypeEOF = 0,
+		
+// free words
+		SymbolName,     // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
 
 // cap types
 		LParen,         // (
@@ -33,6 +35,7 @@ typedef struct Token {
 		SemiColon,      // ;
 		Dot,            // .
     
+		Equal,          // =
 		Plus,           // +
 		Minus,          // -
 		Star,           // *
@@ -61,7 +64,7 @@ typedef struct Token {
 
 // literal types
 		Number,         // [0-9]+
-		Char_literal,   // \'[ascii]*\'
+		Char_Literal,   // \'[ascii]*\'
 		String,         // \"[ascii]*\"
 
 // kept words
@@ -84,9 +87,7 @@ typedef struct Token {
 		Double,         // Double
 		Long,           // Long
 		
-// free words
-		SymbolName,         // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
-	} _token_type;
+	} _tokenType;
 } Token;
 
 #endif 
