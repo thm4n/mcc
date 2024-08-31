@@ -6,13 +6,13 @@
 #define TOKEN_MAX_IDENTIFIER_LENGTH 256
 
 typedef struct Token {
-	char* _file_path;
+	char* _filePath;
 	int _line;
 	int _col;
 	int _offset;
  
 	int _len;
-	char* _value[TOKEN_MAX_IDENTIFIER_LENGTH];
+	char _value[TOKEN_MAX_IDENTIFIER_LENGTH];
 
 	enum TokenType {
 // invalid and EOF 
@@ -85,13 +85,8 @@ typedef struct Token {
 		Long,           // Long
 		
 // free words
-		Symbol,         // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
+		SymbolName,         // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
 	} _token_type;
 } Token;
-
-// typedef struct AST {
-// 	_node_t _type;
-// 	vector* _values;
-// } AST;
 
 #endif 

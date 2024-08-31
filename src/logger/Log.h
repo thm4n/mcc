@@ -19,20 +19,22 @@ enum LOG_LEVEL {
 
 enum ERROR_CODES {
     SUCCESS = 0,
-    ERRCODE_IO_MSG,
+    ERRCODE_ALLOC,
+    ERRCODE_IO,
+    ERRCODE_USAGE,
 };
 
 #define wlog(msg_type, format, ...) \
-    (_write_log(__FILE__, __FUNCTION__, __LINE__, msg_type, format __VA_OPT__(,) __VA_ARGS__))
+    (_logger_write(__FILE__, __FUNCTION__, __LINE__, msg_type, format __VA_OPT__(,) __VA_ARGS__))
 
 #define errlog(format, ...) \
-    (_write_log(__FILE__, __FUNCTION__, __LINE__, LOG_ERROR, format __VA_OPT__(,) __VA_ARGS__))
+    (_logger_write(__FILE__, __FUNCTION__, __LINE__, LOG_ERROR, format __VA_OPT__(,) __VA_ARGS__))
 #define warlog(format, ...) \
-    (_write_log(__FILE__, __FUNCTION__, __LINE__, LOG_WARNING, format __VA_OPT__(,) __VA_ARGS__))
+    (_logger_write(__FILE__, __FUNCTION__, __LINE__, LOG_WARNING, format __VA_OPT__(,) __VA_ARGS__))
 #define inflog(format, ...) \
-    (_write_log(__FILE__, __FUNCTION__, __LINE__, LOG_INFO, format __VA_OPT__(,) __VA_ARGS__))
+    (_logger_write(__FILE__, __FUNCTION__, __LINE__, LOG_INFO, format __VA_OPT__(,) __VA_ARGS__))
 #define dbglog(format, ...) \
-    (_write_log(__FILE__, __FUNCTION__, __LINE__, LOG_DEBUG, format __VA_OPT__(,) __VA_ARGS__))
+    (_logger_write(__FILE__, __FUNCTION__, __LINE__, LOG_DEBUG, format __VA_OPT__(,) __VA_ARGS__))
 
 void _logger_write(const char* file, const char* func, unsigned int line, enum LOG_LEVEL loglevel, const char* format, ...);
 

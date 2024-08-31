@@ -16,8 +16,6 @@ typedef struct Lexer {
     int _tokensLength;
 } Lexer;
 
-void lexer() {
-
-}
+int lexer(Lexer* lexedFile, const char* filePath);
 
 #endif
