@@ -19,9 +19,19 @@ typedef struct Lexer {
     int _tokensArrayLength;
 } Lexer;
 
+Token* createToken(Lexer* lexedFile);
+void freeToken(Token* token);
 
+int replaceTokensArrayCache(Lexer* lexedFile);
+int addToken(Lexer* lexedFile, Token* token);
+
+void skipWhitespace(Lexer* lexedFile);
+char getNextChar(Lexer* lexedFile);
+int readUntil(Lexer* lexedFile, Token* token, int (*cb)(char));
+char peekNextChar(Lexer* lexedFile);
+int isEndOfFile(Lexer* lexedFile);
 int getNextToken(Lexer* lexedFile);
 
-int lexer(Lexer** lexedFile, const char* filePath);
+int lexer(Lexer** pLexedFile, const char* filePath);
 
 #endif

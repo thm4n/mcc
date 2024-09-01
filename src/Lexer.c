@@ -28,8 +28,54 @@ void freeToken(Token* token) {
 	}
 }
 
-void addToken(Lexer* lexedFile, Token* token) {
-	warlog("WIP");
+int replaceTokensArrayCache(Lexer* lexedFile) {
+	Token** tempTokensArray = NULL;
+	int newTokensArrayLength = lexedFile->_tokensArrayLength;
+	int res = SUCCESS;
+
+	tempTokensArray = lexedFile->_tokensArray;
+	newTokensArrayLength += lexedFile->_tokensIndex;
+	lexedFile->_tokensArray = (Token**)malloc(newTokensArrayLength * sizeof(Token*));
+	if(!lexedFile->_tokensArray) {
+		errlog("Failed to allocate memory");
+		res = ERRCODE_ALLOC;
+		goto __replaceTokensArrayCache_end;
+	}
+
+	int i = 0, j = 0;
+	for(i = 0; i < lexedFile->_tokensArrayLength; i++) {
+		lexedFile->_tokensArray[i] = tempTokensArray[i];
+	}
+	for(; i < newTokensArrayLength && j < lexedFile->_tokensIndex; i++, j++) {
+		lexedFile->_tokensArray[i] = lexedFile->_tokens[j];
+	}
+	free(tempTokensArray); // after memory was stashed in 'lexedFile'
+
+	lexedFile->_tokensArrayLength = newTokensArrayLength;
+	memset(lexedFile->_tokens, 0, TOKEN_CACHE_SIZE * sizeof(Token*));
+	lexedFile->_tokensIndex = 0;
+
+__replaceTokensArrayCache_end:
+	if(res != SUCCESS) {
+		if(lexedFile->_tokensArray) {
+			free(lexedFile->_tokensArray);
+			lexedFile->_tokensArray = tempTokensArray;
+		}
+	}
+	return res;
+}
+
+int addToken(Lexer* lexedFile, Token* token) {
+	int res = SUCCESS;
+
+	if(lexedFile->_tokensIndex >= TOKEN_CACHE_SIZE) {
+		dbglog("replacing tokens array cache");
+		res = replaceTokensArrayCache(lexedFile);
+	}
+
+	lexedFile->_tokens[lexedFile->_tokensIndex++] = token;
+
+	return res;
 }
 
 void skipWhitespace(Lexer* lexedFile) {
@@ -70,22 +116,29 @@ char peekNextChar(Lexer* lexedFile) {
 	return ch;
 }
 
+int isEndOfFile(Lexer* lexedFile) {
+	if(feof(lexedFile->_fd)) {
+		dbglog("got EOF");
+		return true;
+	}
+	return false;
+}
+
 int getNextToken(Lexer* lexedFile) {
 	Token* token = NULL;
 	char ch = 0;
 	int res = SUCCESS;
 	
 	token = createToken(lexedFile);
+	if(!token) {
+		res = ERRCODE_ALLOC;
+		goto __getNextToken_end;
+	}
 
 	skipWhitespace(lexedFile);
 	if(isEndOfFile(lexedFile)) {
-		if(!token) {
-			res = ERRCODE_ALLOC;
-			goto __getNextToken_end;
-		}
-
 		token->_tokenType = TokenTypeEOF;
-		addToken(lexedFile, token);
+		res = addToken(lexedFile, token);
 		goto __getNextToken_end;
 	}
 
@@ -230,7 +283,7 @@ int getNextToken(Lexer* lexedFile) {
 		}
 	}
 
-	addToken(lexedFile, token);
+	res = addToken(lexedFile, token);
 
 __getNextToken_end:
 	if(res != SUCCESS) {
