@@ -12,7 +12,7 @@
 
 #define ERRCODE_MEM_MSG "Allocation Error"
 
-#define FILENAME_MAX_LEGNTH 256
+#define FILENAME_MAX_LENGTH 256
 #define IDENTIFIER_MAX_LENGTH 256
 #define TOKEN_CACHE_SIZE 64
 
