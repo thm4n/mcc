@@ -39,6 +39,5 @@ enum ERROR_CODES {
 void _logger_write(const char* file, const char* func, unsigned int line, enum LOG_LEVEL loglevel, const char* format, ...);
 
 void initDebugLog(const char* logPath);
-void closeDebugLog();
 
 #endif
