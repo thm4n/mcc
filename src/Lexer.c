@@ -8,7 +8,6 @@ Token* createToken(Lexer* lexedFile) {
 	}
 
 	strcpy(token->_filePath, lexedFile->_filePath);
-
 	memset(token->_value, 0, IDENTIFIER_MAX_LENGTH);
 	token->_offset = lexedFile->_offset;
 	token->_line = lexedFile->_line;
@@ -131,8 +130,51 @@ int isEndOfFile(Lexer* lexedFile) {
 		return false;
 	return true;
 }
+
+int getFileLength(Lexer* lexedFile) {
+	int res = SUCCESS;
+	int pos = 0;
+
+	if(!lexedFile->_fd) {
+		dbglog("lexedFile->_fd = NULL");
+		res = ERRCODE_USAGE;
+		goto __getFileLength_end;
 	}
-	return false;
+
+	dbglog("checking current position");
+	pos = ftell(lexedFile->_fd);
+	if(pos < 0) {
+		res = pos;
+		dbglog("ftell returned %d", res);
+		goto __getFileLength_end;
+	}
+	
+	dbglog("seeking to end of file");
+	res = fseek(lexedFile->_fd, 0, SEEK_END);
+	if(res != SUCCESS) {
+		dbglog("fseek returned %d", res);
+		goto __getFileLength_end;
+	}
+
+	dbglog("checking current position");
+	lexedFile->_file_length = ftell(lexedFile->_fd);
+	if(pos < 0) {
+		res = pos;
+		dbglog("ftell returned %d", res);
+		goto __getFileLength_end;
+	}
+
+	dbglog("seeking to previous position");
+	res = fseek(lexedFile->_fd, pos, SEEK_SET);
+	if(res != SUCCESS) {
+		dbglog("fseek returned %d", res);
+		goto __getFileLength_end;
+	}
+
+__getFileLength_end:
+	if(res != SUCCESS)
+		warlog("failed to determine file length: %d", res);
+	return res;
 }
 
 int getNextToken(Lexer* lexedFile) {
@@ -140,150 +182,205 @@ int getNextToken(Lexer* lexedFile) {
 	char ch = 0;
 	int res = SUCCESS;
 	
+	dbglog("creating token");
 	token = createToken(lexedFile);
 	if(!token) {
+		dbglog("failed to create token");
 		res = ERRCODE_ALLOC;
 		goto __getNextToken_end;
 	}
 
+	dbglog("skipping whitespace");
 	skipWhitespace(lexedFile);
+	dbglog("checking if EOF");
 	if(isEndOfFile(lexedFile)) {
+		dbglog("EOF: True");
 		token->_tokenType = TokenTypeEOF;
 		res = addToken(lexedFile, token);
+		if(res != SUCCESS) {
+			errlog("failed to add token of type EOF");
+		}
+		else {
+			res = TokenTypeEOF;
+		}
 		goto __getNextToken_end;
 	}
 
-	ch = getNextChar(lexedFile);
+	dbglog("peeking at next char");
+	ch = peekNextChar(lexedFile);
 	switch(ch) {
-	case ',':
-		token->_tokenType = Comma;
-		token->_value[token->_offset++] = ch;
-		break;
-	case ';':
-		token->_tokenType = SemiColon;
-		token->_value[token->_offset++] = ch;
-		break;
 	case '(':
 		token->_tokenType = LParen;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case ')':
 		token->_tokenType = RParen;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case '[':
 		token->_tokenType = LBrack;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case ']':
 		token->_tokenType = RBrack;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case '{':
 		token->_tokenType = LBrace;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case '}':
 		token->_tokenType = RBrace;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
-	case '*':
-		token->_tokenType = Star;
-		token->_value[token->_offset++] = ch;
+	
+	case ',':
+		token->_tokenType = Comma;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
-	case '/':
-		token->_tokenType = Slash;
-		token->_value[token->_offset++] = ch;
+	case ':':
+		token->_tokenType = Colon;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
-	case '%':
-		token->_tokenType = Percent;
-		token->_value[token->_offset++] = ch;
+	case ';':
+		token->_tokenType = SemiColon;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '.':
+		token->_tokenType = Dot;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+
+	case '=':
+		token->_tokenType = Equal;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		if(peekNextChar(lexedFile) == '=') {
+			token->_tokenType = Eq;
+			token->_value[token->_len++] = getNextChar(lexedFile);
+		}
 		break;
 	case '+':
 		token->_tokenType = Plus;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 	case '-':
 		token->_tokenType = Minus;
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '*':
+		token->_tokenType = Star;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '/':
+		token->_tokenType = Slash;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '%':
+		token->_tokenType = Percent;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '&':
+		token->_tokenType = Ampersand;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		if(peekNextChar(lexedFile) == '&') {
+			token->_tokenType = DAmp;
+			token->_value[token->_len++] = getNextChar(lexedFile);
+		}
+		break;
+	case '|':
+		token->_tokenType = Pipe;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		if(peekNextChar(lexedFile) == '|') {
+			token->_tokenType = DPipe;
+			token->_value[token->_len++] = getNextChar(lexedFile);
+		}
+		break;
+	case '^':
+		token->_tokenType = Caret;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '~':
+		token->_tokenType = Tilde;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '!':
+		token->_tokenType = Exclam;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		if(peekNextChar(lexedFile) == '=') {
+			token->_tokenType = Ne;
+			token->_value[token->_len++] = getNextChar(lexedFile);
+		}
+		break;
+	case '#':
+		token->_tokenType = Hash;
+		token->_value[token->_len++] = getNextChar(lexedFile);
+		break;
+	case '\\':
+		token->_tokenType = BSlash;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		break;
 
-
 	case '<':
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		switch(peekNextChar(lexedFile)) {
 		case '<':
 			token->_tokenType = Shl;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
+			token->_value[token->_len++] = getNextChar(lexedFile);
 			break;
 		case '=':
 			token->_tokenType = Le;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
+			token->_value[token->_len++] = getNextChar(lexedFile);
 			break;
 		default:	
 			token->_tokenType = Lt;
 		}
 		break;
 	case '>':
-		token->_value[token->_offset++] = ch;
+		token->_value[token->_len++] = getNextChar(lexedFile);
 		switch(peekNextChar(lexedFile)) {
 		case '>':
 			token->_tokenType = Shr;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
+			token->_value[token->_len++] = getNextChar(lexedFile);
 			break;
 		case '=':
 			token->_tokenType = Ge;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
+			token->_value[token->_len++] = getNextChar(lexedFile);
 			break;
 		default:	
 			token->_tokenType = Gt;
 		}
 		break;
-	case '!':
-		token->_tokenType = Exclam;
-		token->_value[token->_offset++] = ch;
-		if(peekNextChar(lexedFile) == '=') {
-			token->_tokenType = Ne;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
-		}
-		break;
-	case '=':
-		token->_tokenType = Equal;
-		token->_value[token->_offset++] = ch;
-		if(peekNextChar(lexedFile) == '=') {
-			token->_tokenType = Eq;
-			token->_value[token->_offset++] = getNextChar(lexedFile);
-		}
-		break;
+
+
 	
 	default:
+		dbglog("got to default in switch-case");
+
 		if(IS_ALPHA(ch) || ch == '_') {
-			res = readUntil(lexedFile, token, isAllowedInIdentifier);
-			if(res != SUCCESS) {
-				errlog("failed to read expected identifier: '%s'. failed with error: %d", token->_value, res);
-				goto __getNextToken_end;
-			}
+			dbglog("readUntil: isAllowedInIndentifier");
+			readUntil(lexedFile, token, isAllowedInIdentifier);
 			token->_tokenType = SymbolName;
 		}
 		else if(IS_DIGIT(ch)) {
-			res = readUntil(lexedFile, token, isAllowedInNumber);
-			if(res != SUCCESS) {
-				errlog("failed to read expected number: '%s'. failed with error: %d", token->_value, res);
-				goto __getNextToken_end;
-			}
+			dbglog("readUntil: isAllowedInNumber");
+			readUntil(lexedFile, token, isAllowedInNumber);
 			token->_tokenType = Number;
 		}
 		else if(ch == '"') {
-			res = readUntil(lexedFile, token, isDQuotes);
-			if(res != SUCCESS) {
+			getNextChar(lexedFile);
+			dbglog("readUntil: isDQuotes");
+			readUntil(lexedFile, token, isDQuotes);
+			if(getNextChar(lexedFile) != ch) {
 				errlog("failed to read string '%s'. failed with error: %d", token->_value, res);
 				goto __getNextToken_end;
 			}
 			token->_tokenType = String;
 		}
 		else if(ch == '\'') {
-			res = readUntil(lexedFile, token, isQuote);
-			if(res != SUCCESS) {
+			getNextChar(lexedFile);
+			dbglog("readUntil: isQuote");
+			readUntil(lexedFile, token, isQuote);
+			if(getNextChar(lexedFile) != ch) {
 				errlog("failed to read string '%s'. failed with error: %d", token->_value, res);
 				goto __getNextToken_end;
 			}
@@ -295,11 +392,15 @@ int getNextToken(Lexer* lexedFile) {
 	}
 
 	res = addToken(lexedFile, token);
-
+	if(res != SUCCESS) {
+		errlog("failed to add token '%s'. failed with error: %d", token->_value, res);
+		goto __getNextToken_end;
+	}
+	
 __getNextToken_end:
 	if(res != SUCCESS) {
 		if(token) {
-			freeToken(token);
+			// freeToken(token);
 		}
 	}
 
