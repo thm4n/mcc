@@ -15,11 +15,11 @@ typedef struct Token {
 
 	enum TokenType {
 // invalid and EOF 
-		Invalid = -1,
-		TokenTypeEOF = 0,
+		Invalid = -2,
+		TokenTypeEOF = -1,
 		
 // free words
-		SymbolName,     // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
+		SymbolName = 1,     // ( a-z | A-Z | _ )[ a-z | A-Z | 0-9 | _ ]*
 
 // cap types
 		LParen,         // (
@@ -46,7 +46,7 @@ typedef struct Token {
 		Caret,          // ^
 		Tilde,          // ~
 		Exclam,         // !
-		At,             // @
+		// At,             // @
 		Hash,           // #
 		BSlash,         // "\"
 
@@ -61,6 +61,10 @@ typedef struct Token {
 		Gt,             // >
 		Le,             // <=
 		Ge,             // >=
+
+// binary operations
+		DPipe,             // ||
+		DAmp,              // &&
 
 // literal types
 		Number,         // [0-9]+

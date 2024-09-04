@@ -33,5 +33,6 @@ int isEndOfFile(Lexer* lexedFile);
 int getNextToken(Lexer* lexedFile);
 
 int lexer(Lexer** pLexedFile, const char* filePath);
+void freeLexer(Lexer* lexedFile);
 
 #endif

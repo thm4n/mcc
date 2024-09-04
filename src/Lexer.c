@@ -325,6 +325,12 @@ int lexer(Lexer** pLexedFile, const char* filePath) {
 	lexedFile->_offset = 0;
 	lexedFile->_col = 0;
 	lexedFile->_line = 1;
+	ret = getFileLength(lexedFile);
+	if(ret != SUCCESS) {
+		dbglog("error getting file length");
+		goto __lexer_end;
+	}
+	dbglog("lexedFile->_file_length = %d", lexedFile->_file_length);
 
 	lexedFile->_tokensIndex = 0;
 
@@ -332,8 +338,18 @@ int lexer(Lexer** pLexedFile, const char* filePath) {
 	lexedFile->_tokensArrayLength = 0;
 
 	do {
+		ret = getNextToken(lexedFile);
+	} while(ret == SUCCESS);
+	
+	if(ret != TokenTypeEOF) {
+		goto __lexer_end;
+	}
 
-	} while(lexedFile->_tokens[lexedFile->_tokensIndex] && lexedFile->_tokens[lexedFile->_tokensIndex]->_tokenType != TokenTypeEOF);
+	ret = replaceTokensArrayCache(lexedFile);
+	if(ret != SUCCESS) {
+		errlog("failed to replace tokens cache array. failed with error: %d", ret);
+		goto __lexer_end;
+	}
 
 __lexer_end:
 	if(ret == SUCCESS) {
@@ -358,4 +374,60 @@ __lexer_end:
 	}
 
 	return ret;
+}
+
+void freeLexer(Lexer* lexedFile) {
+	if(!lexedFile) {
+		warlog("lexedFile is NULL");
+		goto __freeLexer_end;
+	}
+
+	if(lexedFile->_fd) {
+		dbglog("closing lexedFile->_fd");
+		fclose(lexedFile->_fd);
+		lexedFile->_fd = NULL;
+	}
+	else {
+		dbglog("lexedFile->_fd is NULL");
+	}
+
+	if(lexedFile->_tokensIndex > 0) {
+		warlog("lexedFile->_tokens is not empty!!!");
+		for(int i = 0; i < lexedFile->_tokensIndex; i++) {
+			if(lexedFile->_tokens[i]) {
+				dbglog("freeing: lexedFile->_tokens[%d]: '%s'", i, lexedFile->_tokens[i]->_value);
+				freeToken(lexedFile->_tokens[i]);
+				lexedFile->_tokens[i] = NULL;
+			}
+			else {
+				errlog("lexedFile->_tokens[%d] is NULL - ERROR");
+			}
+		}
+		lexedFile->_tokensIndex = 0;
+	}
+
+	dbglog("freeing lexedFile->_tokensArray contents");
+	if(!lexedFile->_tokensArray) {
+		warlog("lexedFIle->_tokensArray is NULL");
+		goto __freeLexer_end;
+	}
+	for(int i = 0; i < lexedFile->_tokensArrayLength; i++) {
+		if(lexedFile->_tokensArray[i]) {
+			dbglog("freeing: lexedFile->_tokensArray[%d]: '%s'", i, lexedFile->_tokensArray[i]->_value);
+			freeToken(lexedFile->_tokensArray[i]);
+			lexedFile->_tokensArray[i] = NULL;
+		}
+		else {
+			errlog("lexedFile->_tokensArray[%d] is NULL - ERROR");
+		}
+	}
+	dbglog("freeing lexedFile->_tokensArray");
+	free(lexedFile->_tokensArray);
+	lexedFile->_tokensArray = NULL;
+
+	dbglog("freeing lexedFile");
+	free(lexedFile);
+	
+__freeLexer_end:
+	lexedFile = NULL;
 }

@@ -31,9 +31,9 @@ int main(int argc, char** argv) {
 	}
 
 __main_end:
-	if(lexedFile) {
+	if(lexedFile) {		
 		dbglog("Deallocating 'lexedFile'");
-		free(lexedFile);
+		freeLexer(lexedFile);
 	}
 	return 0;
 }
