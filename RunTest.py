@@ -100,7 +100,6 @@ def main():
     test_files = load_test_files(args)
 
     stage = 1
-    import ipdb; ipdb.set_trace()
     while stage <= args.stage:
         curr_list = [f for f in test_files if(f['stage'] == stage and f['valid'])]
         for test_file in curr_list:
