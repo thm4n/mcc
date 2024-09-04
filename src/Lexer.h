@@ -8,6 +8,7 @@ typedef struct Lexer {
     char _filePath[FILENAME_MAX_LENGTH];
     FILE* _fd;
     
+    int _file_length;
     int _offset;
     int _line;
     int _col;
@@ -27,7 +28,7 @@ int addToken(Lexer* lexedFile, Token* token);
 
 void skipWhitespace(Lexer* lexedFile);
 char getNextChar(Lexer* lexedFile);
-int readUntil(Lexer* lexedFile, Token* token, int (*cb)(char));
+void readUntil(Lexer* lexedFile, Token* token, int (*cb)(char));
 char peekNextChar(Lexer* lexedFile);
 int isEndOfFile(Lexer* lexedFile);
 int getNextToken(Lexer* lexedFile);

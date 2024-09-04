@@ -96,10 +96,16 @@ char getNextChar(Lexer* lexedFile) {
 	return ch;
 }
 
-int readUntil(Lexer* lexedFile, Token* token, int (*cb)(char)) {
-	int res = SUCCESS;
-	warlog("WIP");
-	return res;
+void readUntil(Lexer* lexedFile, Token* token, int (*cb)(char)) {
+	char ch = 0;
+
+	ch = peekNextChar(lexedFile);
+	while(cb(ch) && ch != EOF) {
+		ch = getNextChar(lexedFile);
+		if(token)
+			token->_value[token->_len++] = ch;
+		ch = peekNextChar(lexedFile);
+	}
 }
 
 char peekNextChar(Lexer* lexedFile) {
