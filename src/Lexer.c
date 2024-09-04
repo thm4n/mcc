@@ -9,6 +9,7 @@ Token* createToken(Lexer* lexedFile) {
 
 	strcpy(token->_filePath, lexedFile->_filePath);
 
+	memset(token->_value, 0, IDENTIFIER_MAX_LENGTH);
 	token->_offset = lexedFile->_offset;
 	token->_line = lexedFile->_line;
 	token->_col = lexedFile->_col;
@@ -20,7 +21,7 @@ Token* createToken(Lexer* lexedFile) {
 
 void freeToken(Token* token) {
 	if(token) {
-		dbglog("Deallocating token");
+		dbglog("Deallocating token: '%s'", token->_value);
 		free(token);
 	}
 	else {
@@ -79,19 +80,21 @@ int addToken(Lexer* lexedFile, Token* token) {
 }
 
 void skipWhitespace(Lexer* lexedFile) {
-	warlog("WIP");
+	readUntil(lexedFile, NULL, isWhitespace);
 }
 
 char getNextChar(Lexer* lexedFile) {
 	char ch = 0;
 	
-	if(feof(lexedFile->_fd)) {
+	if(isEndOfFile(lexedFile)) {
 		warlog("unexpected EOF");
 		return EOF;
 	}
 
+	dbglog("lexedFile->_offset: %d", lexedFile->_offset);
 	ch = fgetc(lexedFile->_fd);
 	lexedFile->_offset++;
+	dbglog("lexedFile->_offset: %d", lexedFile->_offset);
 
 	return ch;
 }
@@ -111,7 +114,7 @@ void readUntil(Lexer* lexedFile, Token* token, int (*cb)(char)) {
 char peekNextChar(Lexer* lexedFile) {
 	char ch = 0;
 
-	if(feof(lexedFile->_fd)) {
+	if(isEndOfFile(lexedFile)) {
 		warlog("unexpected EOF");
 		return EOF;
 	}
