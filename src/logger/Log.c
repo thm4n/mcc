@@ -51,9 +51,9 @@ void _logger_write(const char* file, const char* func, unsigned int line, enum L
         fprintf(logger_fd, " >> %-5s - %-40s:%-24s:%d - %s\n", getMsgStr(loglevel), file, func, line, msg);
     }
     else if(DEBUG) {
-        setTermColorByLogLevel(stdout, loglevel);
-        fprintf(stdout, " >> %-5s - %-40s:%-24s:%d - %s\n", getMsgStr(loglevel), file, func, line, msg);
-        setTermColorByLogLevel(stdout, LOG_OFF);
+        setTermColorByLogLevel(stderr, loglevel);
+        fprintf(stderr, " >> %-5s - %-40s:%-24s:%d - %s\n", getMsgStr(loglevel), file, func, line, msg);
+        setTermColorByLogLevel(stderr, LOG_OFF);
     }
 }
 
