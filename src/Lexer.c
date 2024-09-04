@@ -123,9 +123,11 @@ char peekNextChar(Lexer* lexedFile) {
 }
 
 int isEndOfFile(Lexer* lexedFile) {
-	if(feof(lexedFile->_fd)) {
-		dbglog("got EOF");
-		return true;
+	dbglog("lexedFile->_offset: %d", lexedFile->_offset);
+	if(lexedFile->_offset < lexedFile->_file_length)
+		return false;
+	return true;
+}
 	}
 	return false;
 }
