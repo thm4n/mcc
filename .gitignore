@@ -1,4 +1,3 @@
-*.o
-*.log
-./mcc
+bin
+logs
 .vscode
