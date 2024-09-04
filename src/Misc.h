@@ -8,6 +8,7 @@
 
 int isAlpha(char ch);
 int isDigit(char ch);
+int isWhitespace(char ch);
 int isAllowedInIdentifier(char ch);
 int isAllowedInNumber(char ch);
 int isDQuotes(char ch);

@@ -8,6 +8,13 @@ int isDigit(char ch) {
     return IS_DIGIT(ch);
 }
 
+int isWhitespace(char ch) {
+    return (ch == '\t' ||
+            ch == '\n' ||
+            ch == ' '  ||
+            ch == '\r');
+}
+
 int isAllowedInIdentifier(char ch) {
     return (isAlpha(ch) || isDigit(ch) || ch == '_');
 }
