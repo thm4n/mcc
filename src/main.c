@@ -25,12 +25,9 @@ int main(int argc, char** argv) {
 	}
 	dbglog("lexer returned with lexed file");
 
-	printf("lexedFile->_filePath: %s", lexedFile->_filePath);
-	printf("lexedFile->_tokensArrayLength: %d", lexedFile->_tokensArrayLength);
 	for(int i = 0; i < lexedFile->_tokensArrayLength; i++) {
 		tok = lexedFile->_tokensArray[i];
-		printf("Token:\n >> file: %s\n >> line, col, offset: (%d, %d) - %d\n >> length: %d\n >> value: '%s'",
-				tok->_filePath, tok->_line, tok->_col, tok->_offset, tok->_len, tok->_value);
+		printf("%s ", tok->_value);
 	}
 
 __main_end:
