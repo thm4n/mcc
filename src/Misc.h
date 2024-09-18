@@ -14,4 +14,6 @@ int isAllowedInNumber(char ch);
 int isDQuotes(char ch);
 int isQuote(char ch);
 
+int isTypeIdentifier(Token* tok);
+
 #endif

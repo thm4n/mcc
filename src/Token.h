@@ -89,7 +89,7 @@ typedef struct Token {
 		Char,           // char
 		Float,          // Float
 		Double,         // Double
-		Long,           // Long
+		// Long,           // Long
 		
 	} _tokenType;
 } Token;

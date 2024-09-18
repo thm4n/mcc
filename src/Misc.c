@@ -30,3 +30,14 @@ int isDQuotes(char ch) {
 int isQuote(char ch) {
     return ch == '\'';
 }
+
+int isTypeIdentifier(Token* tok) {
+    if(!tok) return false;
+    switch(tok->_tokenType) {
+    case Void:
+    case Int:
+    case Char:
+        return true;
+    }
+    return false;
+}

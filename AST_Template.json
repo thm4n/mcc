@@ -1,0 +1,82 @@
+// int a = 100;
+// int main() {
+//     int b = a;
+//     b = a + 1;
+//     return b;
+// }
+
+
+[
+    {
+        "node_type": "declaration",
+        "name": "a",
+        "type": "int",
+        "statements": [
+            {
+                "node_type": "literal",
+                "op": [100]
+            }
+        ]
+    },
+    {
+        "node_type": "declaration",
+        "name": "main",
+        "type": "int",
+        "arguments": [],
+
+        "statements": [
+            {
+                "node_type": "declaration",
+                "name": "b",
+                "type": "int",
+                "statements": [
+                    {
+                        "node_type": "symbol",
+                        "name": "a",
+                        "type": "int",
+                        "statements": []
+                    }
+                ]
+            },
+            {
+                "node_type": "assignment",
+                "name": "b",
+                "type": "int",
+                "statements": [
+                    {
+                        "node_type": "expression",
+                        "name": "addition",
+                        "type": "int",
+                        "statements": [
+                            {
+                                "node_type": "symbol",
+                                "name": "a",
+                                "type": "int",
+                                "statements": []
+                            },
+                            {
+                                "node_type": "literal",
+                                "name": "1",
+                                "type": "int",
+                                "statements": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "node_type": "expression",
+                "name": "return",
+                "type": "int",
+                "statements": [
+                    {
+                        "node_type": "symbol",
+                        "name": "b",
+                        "type": "int",
+                        "statements": []
+                    }
+                ]
+            }
+        ]
+    }
+]

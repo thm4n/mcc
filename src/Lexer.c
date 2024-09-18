@@ -470,7 +470,7 @@ __lexer_end:
 	}
 	else {
 		dbglog("got to __lexer_end with errcode %d", ret);
-		if(lexedFile) {
+		if(lexedFile && ret != ERRCODE_USAGE) {
 			dbglog("Deallocating 'lexedFile'");
 			if(lexedFile->_filePath) {
 				dbglog("Deallocating 'lexedFile->_filePath'");
@@ -519,20 +519,19 @@ void freeLexer(Lexer* lexedFile) {
 	}
 
 	dbglog("freeing lexedFile->_tokensArray contents");
-	if(!lexedFile->_tokensArray) {
-		warlog("lexedFIle->_tokensArray is NULL");
-		goto __freeLexer_end;
-	}
-	for(int i = 0; i < lexedFile->_tokensArrayLength; i++) {
-		if(lexedFile->_tokensArray[i]) {
-			dbglog("freeing: lexedFile->_tokensArray[%d]: '%s'", i, lexedFile->_tokensArray[i]->_value);
-			freeToken(lexedFile->_tokensArray[i]);
-			lexedFile->_tokensArray[i] = NULL;
-		}
-		else {
-			errlog("lexedFile->_tokensArray[%d] is NULL - ERROR");
+	if(lexedFile->_tokensArray) {
+		for(int i = 0; i < lexedFile->_tokensArrayLength; i++) {
+			if(lexedFile->_tokensArray[i]) {
+				dbglog("freeing: lexedFile->_tokensArray[%d]: '%s'", i, lexedFile->_tokensArray[i]->_value);
+				freeToken(lexedFile->_tokensArray[i]);
+				lexedFile->_tokensArray[i] = NULL;
+			}
+			else {
+				errlog("lexedFile->_tokensArray[%d] is NULL - ERROR");
+			}
 		}
 	}
+	
 	dbglog("freeing lexedFile->_tokensArray");
 	free(lexedFile->_tokensArray);
 	lexedFile->_tokensArray = NULL;

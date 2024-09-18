@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import argparse
 import os
 import subprocess
@@ -112,8 +114,6 @@ def main():
             print(f"for stage {stage} invalid test '{test_file['name']}' : {res}")
 
         stage += 1
-
-
 
 if __name__ == "__main__":
     main()
